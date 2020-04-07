@@ -21,4 +21,23 @@ router.get('/', (req, res) => {
         })
 })
 
+router.post('/', (req, res) => {
+    const newPost = req.body;
+    if (newPost.title && newPost.contents) {
+        db.insert(req.body)
+        .then((response) => res.json(response))
+        .catch((error) => res.status(500).json(
+            { 
+                errorMessage: 'There was an error while saving the post to the database'
+            }
+        ))
+    } else {
+        res.status(400).json(
+            {
+                errorMessage: 'Please provide title and contents for the post'
+            }
+        )
+    }
+})
+
 module.exports = router;
