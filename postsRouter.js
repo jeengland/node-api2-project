@@ -105,4 +105,24 @@ router.put('/:id', (req, res) => {
     }
 })
 
+router.get('/:id/comments', (req, res) => {
+    const id = req.params.id;
+    db.findPostComments(id)
+        .then((comments) => {
+            if (comments.length) {
+                res.status(200).json(comments);
+            } else {
+                res.status(404).json({
+                    errorMessage: 'The post with the specified ID does not exist'
+                })
+            }
+        })
+        .catch((error) => {
+            console.error(error);
+            res.status(500).json({
+                errorMessage: 'The comments information could not be retrieved'
+            })
+        }) 
+})
+
 module.exports = router;
