@@ -24,7 +24,7 @@ router.get('/', (req, res) => {
 router.post('/', (req, res) => {
     const newPost = req.body;
     if (newPost.title && newPost.contents) {
-        db.insert(req.body)
+        db.insert(newPost)
         .then((post) => res.status(201).json(post))
         .catch((error) => {
             console.error(error);
@@ -80,7 +80,7 @@ router.put('/:id', (req, res) => {
     const newPost = req.body;
     
     if (newPost.title && newPost.contents) {
-        db.update(id, req.body)
+        db.update(id, newPost)
         .then((count) => {
             if (count) {
                 res.status(200).json({ 
@@ -107,22 +107,52 @@ router.put('/:id', (req, res) => {
 
 router.get('/:id/comments', (req, res) => {
     const id = req.params.id;
-    db.findPostComments(id)
-        .then((comments) => {
-            if (comments.length) {
-                res.status(200).json(comments);
+    db.findById(id)
+        .then((post) => {
+            if (post.length) {
+                db.findPostComments(id)
+                    .then((comments) => {
+                        res.status(200).json(comments);
+                    })
+                    .catch((error) => {
+                        console.error(error);
+                        res.status(500).json({
+                            errorMessage: 'The comments information could not be retrieved'
+                        })
+                    }) 
             } else {
                 res.status(404).json({
                     errorMessage: 'The post with the specified ID does not exist'
                 })
             }
         })
-        .catch((error) => {
-            console.error(error);
-            res.status(500).json({
-                errorMessage: 'The comments information could not be retrieved'
+})
+
+router.post('/:id/comments', (req, res) => {
+    const newComment = req.body;
+    newComment.post_id = req.params.id;
+    if (newComment.text) {
+        db.insertComment(newComment)
+            .then((comment) => {
+                if (comment) {
+                    res.status(201).json(comment)
+                } else {
+                    res.status(404).json({
+                        errorMessage: 'The post with the specified ID does not exist'
+                    })
+                }
             })
-        }) 
+            .catch((error) => {
+                console.error(error);
+                res.status(500).json({
+                    errorMessage: 'There was  an error while saving the comment to the database'
+                })
+            })
+    } else {
+        res.status(400).json({
+            errorMessage: 'Please provide text for the comment'
+        })
+    }
 })
 
 module.exports = router;
