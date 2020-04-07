@@ -1,5 +1,6 @@
 // dependencies
 const express = require('express');
+const cors = require('cors');
 
 const postsRouter = require('./postsRouter.js');
 
@@ -8,6 +9,7 @@ const server = express();
 
 // middleware
 server.use(express.json());
+server.use(cors());
 
 // routers
 server.use('/api/posts', postsRouter);
