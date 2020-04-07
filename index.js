@@ -1,7 +1,7 @@
 // dependencies
 const express = require('express');
 
-const Database = require('./data/db.js');
+const postsRouter = require('./postsRouter.js');
 
 // setup
 const server = express();
@@ -9,7 +9,10 @@ const server = express();
 // middleware
 server.use(express.json());
 
-// endpoints
+// routers
+server.use('/api/posts', postsRouter);
+
+// test endpoint
 server.get('/', (req, res) => {
     res.send('Node API Project 2 server is live')
 })
