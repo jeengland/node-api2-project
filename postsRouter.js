@@ -28,18 +28,14 @@ router.post('/', (req, res) => {
         .then((post) => res.status(201).json(post))
         .catch((error) => {
             console.error(error);
-            res.status(500).json(
-                { 
+            res.status(500).json({ 
                     errorMessage: 'There was an error while saving the post to the database'
-                }
-            )
             })
+         })
     } else {
-        res.status(400).json(
-            {
+        res.status(400).json({
                 errorMessage: 'Please provide title and contents for the post'
-            }
-        )
+        })
     }
 })
 
@@ -50,12 +46,16 @@ router.get('/:id', (req, res) => {
             if (post.length) {
                 res.status(200).json(post)
             } else {
-                res.status(404).json({ errorMessage: 'The post with the specified ID does not exist' })
+                res.status(404).json({ 
+                    errorMessage: 'The post with the specified ID does not exist' 
+                })
             }
         })
         .catch((error) => {
             console.error(error);
-            res.status(500).json({ errorMessage: 'The post information could not be retrieved' })
+            res.status(500).json({ 
+                errorMessage: 'The post information could not be retrieved' 
+            })
         })
 })
 
@@ -73,6 +73,36 @@ router.delete('/:id', (req, res) => {
             console.error(error);
             res.status(500).json({ errorMessage: 'The post could not be removed' })
         })
+})
+
+router.put('/:id', (req, res) => {
+    const id = Number(req.params.id);
+    const newPost = req.body;
+    
+    if (newPost.title && newPost.contents) {
+        db.update(id, req.body)
+        .then((count) => {
+            if (count) {
+                res.status(200).json({ 
+                    message: 'Post was successfully updated' 
+                })
+            } else {
+                res.status(404).json({ 
+                    errorMessage: 'The post with the specified ID does not exist' 
+                })
+            }
+        })
+        .catch((error) => {
+            console.error(error);
+            res.status(500).json({ 
+                errorMessage: 'The post information could not be modified' 
+            })
+        })
+    } else {
+        res.status(400).json({ 
+            errorMessage: 'Please provide title and contents for the post' 
+        })
+    }
 })
 
 module.exports = router;
